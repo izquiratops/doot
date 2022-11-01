@@ -61,7 +61,7 @@ export class Box {
 		  20, 21, 22,     20, 22, 23,   // Left
     ];
 
-    // [0, 0, 1] facinbg forward
+    // [0, 0, 1] facing forward
     // [0, 0, -1] facing away
     // [1, 0, 0] facing  right
     // [0, 1, 0] facing up

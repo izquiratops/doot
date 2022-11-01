@@ -1,25 +1,27 @@
+import {KeyCharacter} from "./types";
+
 export class Input {
-    private WASD = 'wasd'.split('');
+    private readonly WASD = 'wasd'.split('');
 
-    keyState = new Map<string, number>([
-        ['w', 0],
-        ['a', 0],
-        ['s', 0],
-        ['d', 0],
-        ['leftClick', 0],
-        ['rightClick', 0],
-    ]);
+    readonly keyState = Object.seal({
+        'w': 0,
+        'a': 0,
+        's': 0,
+        'd': 0,
+        'leftClick': 0,
+        'rightClick': 0,
+    });
 
-    mouseCoords = {
+    readonly mouseCoords = Object.seal({
         x: 0, y: 0
-    }
+    });
 
     runListeners = (canvas: HTMLCanvasElement) => {
         document.onkeydown = (ev) => {
             ev.preventDefault();
 
             if (this.WASD.includes(ev.key)) {
-                this.keyState.set(ev.key, 1);
+                this.keyState[ev.key as KeyCharacter] = 1;
             }
         }
 
@@ -27,7 +29,7 @@ export class Input {
             ev.preventDefault();
 
             if (this.WASD.includes(ev.key)) {
-                this.keyState.set(ev.key, 0);
+                this.keyState[ev.key as KeyCharacter] = 0;
             }
         }
 
@@ -43,9 +45,9 @@ export class Input {
 
             // ev.button -> 0: Left | 1: Middle | 2: Right
             if (ev.button === 0) {
-                this.keyState.set('leftClick', 1);
+                this.keyState['leftClick'] = 1;
             } else if (ev.button === 2) {
-                this.keyState.set('rightClick', 1);
+                this.keyState['rightClick'] = 1;
             }
         };
 
@@ -54,9 +56,9 @@ export class Input {
 
             // ev.button -> 0: Left | 1: Middle | 2: Right
             if (ev.button === 0) {
-                this.keyState.set('leftClick', 1);
+                this.keyState['leftClick'] = 0;
             } else if (ev.button === 2) {
-                this.keyState.set('rightClick', 1);
+                this.keyState['rightClick'] = 0;
             }
         };
     }
