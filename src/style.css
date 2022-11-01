@@ -1,0 +1,28 @@
+:root {
+    --background: hsl(15 5% 20%);
+    --font-primary-color: hsl(0 0% 100%);
+}
+
+html {
+    block-size: 100%;
+    inline-size: 100%;
+}
+
+body {
+    min-block-size: 100%;
+    min-inline-size: 100%;
+
+    box-sizing: border-box;
+    margin: 0;
+
+    background: var(--background);
+    color: var(--font-primary-color);
+
+    font-family: system-ui, sans-serif;
+}
+
+canvas {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+}
