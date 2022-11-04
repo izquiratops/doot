@@ -4,7 +4,7 @@ import { Renderer } from './renderer/renderer';
 // Scene data
 import { FRAGMENT_SOURCE, VERTEX_SOURCE } from './renderer/shaders';
 import { Box } from './objects/box';
-import { Input } from "./input/input";
+import { Input } from './input/input';
 
 window.onload = () => {
     // Get Canvas DOM reference

@@ -1,19 +1,20 @@
-import {KeyCharacter} from "./types";
+import { KeyCharacter } from './types';
 
 export class Input {
     private readonly WASD = 'wasd'.split('');
 
     readonly keyState = Object.seal({
-        'w': 0,
-        'a': 0,
-        's': 0,
-        'd': 0,
-        'leftClick': 0,
-        'rightClick': 0,
+        w: 0,
+        a: 0,
+        s: 0,
+        d: 0,
+        leftClick: 0,
+        rightClick: 0,
     });
 
     readonly mouseCoords = Object.seal({
-        x: 0, y: 0
+        x: 0,
+        y: 0,
     });
 
     runListeners = (canvas: HTMLCanvasElement) => {
@@ -23,7 +24,7 @@ export class Input {
             if (this.WASD.includes(ev.key)) {
                 this.keyState[ev.key as KeyCharacter] = 1;
             }
-        }
+        };
 
         document.onkeyup = (ev) => {
             ev.preventDefault();
@@ -31,14 +32,14 @@ export class Input {
             if (this.WASD.includes(ev.key)) {
                 this.keyState[ev.key as KeyCharacter] = 0;
             }
-        }
+        };
 
         canvas.onmousemove = (ev) => {
             ev.preventDefault();
 
             this.mouseCoords.x += ev.movementX;
             this.mouseCoords.y += ev.movementY;
-        }
+        };
 
         canvas.onmousedown = (ev) => {
             ev.preventDefault();
@@ -61,5 +62,5 @@ export class Input {
                 this.keyState['rightClick'] = 0;
             }
         };
-    }
+    };
 }

@@ -5,14 +5,14 @@
     "scripts": {
         "build": "node build.js",
         "serve": "npx http-server dist -c-1",
-        "format": "npx prettier --write ./src/**/*.ts"
+        "format": "npx prettier --write ."
     },
     "author": "Jordi Izquierdo <hi@izquiratops.dev>",
     "license": "ISC",
     "devDependencies": {
         "esbuild": "^0.14.47",
+        "gl-matrix": "^3.4.3",
         "prettier": "^2.7.1",
-        "typescript": "^4.7.4",
-        "gl-matrix": "^3.4.3"
+        "typescript": "^4.7.4"
     }
 }

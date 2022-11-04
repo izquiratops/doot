@@ -1,4 +1,4 @@
-import {WorldEntities} from "./types";
+import { WorldEntities } from './types';
 
 export class Game {
     readonly TICK = 1 / 60;
@@ -6,7 +6,7 @@ export class Game {
         items: null,
         enemies: null,
         player: null,
-    }
+    };
 
     initializeNewGame() {
         this.WORLD_ENTITIES.items = [];
