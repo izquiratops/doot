@@ -4,7 +4,7 @@
     "description": "WebGL first person thing",
     "scripts": {
         "build": "node build.js",
-        "serve": "npx http-server dist -c-1",
+        "serve": "npx http-server dist -c-1 --gzip",
         "format": "npx prettier --write ."
     },
     "author": "Jordi Izquierdo <hi@izquiratops.dev>",

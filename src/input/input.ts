@@ -1,4 +1,4 @@
-import { KeyCharacter, InputKeys, MouseCoords } from "./types";
+import { KeyCharacter, InputKeys, MouseCoords } from './types';
 
 export class Input {
     private readonly WASD = 'wasd'.split('');

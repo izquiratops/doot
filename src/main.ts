@@ -1,9 +1,6 @@
-// Utils
-import { Renderer } from './renderer/renderer';
-
-// Scene data
 import { FRAGMENT_SOURCE, VERTEX_SOURCE } from './renderer/shaders';
-import { Box } from './objects/box';
+import { Renderer } from './renderer/renderer';
+import { MapLoader } from './map/map-loader';
 import { Input } from './input/input';
 import { Game } from './game/game';
 
@@ -25,12 +22,13 @@ window.onload = () => {
     const input = new Input();
     input.runListeners(glCanvasRef);
 
-    // TODO Setup game context
-    // const game = new Game();
+    MapLoader.parse('./assets/maps/example.obj').then((data) =>
+        console.log('map loaded', data),
+    );
 
     // Run an instance of the Renderer with WebGL Context and the state of the GUI
     const scene = new Renderer(gl);
     scene.initProgram(VERTEX_SOURCE, FRAGMENT_SOURCE);
-    scene.initBuffers(new Box());
+    // scene.initBuffers();
     scene.runFrames();
 };

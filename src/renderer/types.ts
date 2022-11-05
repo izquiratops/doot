@@ -1,7 +1,7 @@
 export interface RotationAxis {
-    x: number,
-    y: number,
-    z: number
+    x: number;
+    y: number;
+    z: number;
 }
 
 export interface Buffers {

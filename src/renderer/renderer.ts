@@ -1,5 +1,5 @@
 import { glMatrix, mat4, vec3 } from 'gl-matrix';
-import { Buffers, ProgramInfo, RotationAxis } from "./types";
+import { Buffers, ProgramInfo, RotationAxis } from './types';
 import { Box } from '../objects/box';
 
 export class Renderer {
@@ -91,22 +91,25 @@ export class Renderer {
     }
 
     runFrames() {
-        const render = (now: number) => {
+        const gameFrame = (now: number) => {
             now *= 0.001;
 
+            // Clear canvas before drawing on top
             this.clearScene(255, 255, 255);
+
+            // TODO: Update entities
 
             // Check if canvas has to be resized
             this.resizeCanvasToDisplaySize();
 
             // Draw scene on canvas
-            this.drawScene();
+            // this.drawScene();
 
             // Move to the following frame
-            requestAnimationFrame(render);
+            requestAnimationFrame(gameFrame);
         };
 
-        requestAnimationFrame(render);
+        requestAnimationFrame(gameFrame);
     }
 
     private clearScene(r = 0, g = 0, b = 0) {
@@ -123,6 +126,11 @@ export class Renderer {
         // TODO: Num lights to 0 & clear light buffer
     }
 
+    /**
+     * Old method to draw stuff on the screen.
+     * Unused in order to start rendering maps instead of the webGL demo object.
+     * @private
+     */
     private drawScene() {
         const { gl, programInfo, buffers } = this;
 
