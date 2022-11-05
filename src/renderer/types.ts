@@ -1,3 +1,9 @@
+export interface RotationAxis {
+    x: number,
+    y: number,
+    z: number
+}
+
 export interface Buffers {
     position: WebGLBuffer;
     color: WebGLBuffer;

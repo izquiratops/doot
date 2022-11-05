@@ -1,13 +1,14 @@
 import { glMatrix, mat4, vec3 } from 'gl-matrix';
-import { Buffers, ProgramInfo } from './types';
+import { Buffers, ProgramInfo, RotationAxis } from "./types";
 import { Box } from '../objects/box';
 
 export class Renderer {
-    rotation = {
+    readonly rotation: RotationAxis = {
         x: 0,
         y: 0,
         z: 0,
     };
+
     private programInfo: ProgramInfo;
     private buffers: Buffers;
 
@@ -90,7 +91,11 @@ export class Renderer {
     }
 
     runFrames() {
-        const render = () => {
+        const render = (now: number) => {
+            now *= 0.001;
+
+            this.clearScene(255, 255, 255);
+
             // Check if canvas has to be resized
             this.resizeCanvasToDisplaySize();
 
@@ -104,15 +109,23 @@ export class Renderer {
         requestAnimationFrame(render);
     }
 
-    private drawScene() {
-        const { gl, programInfo, buffers } = this;
+    private clearScene(r = 0, g = 0, b = 0) {
+        const { gl } = this;
 
-        gl.clearColor(255, 255, 255, 1); // Clear black
+        gl.clearColor(r, g, b, 1); // Clear black
         gl.clearDepth(1.0); // Clear everything
+
         gl.enable(gl.DEPTH_TEST); // Enable depth
         gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // TODO: Num lights to 0 & clear light buffer
+    }
+
+    private drawScene() {
+        const { gl, programInfo, buffers } = this;
+
         gl.useProgram(programInfo.program);
 
         const projectionMatrix = ((): mat4 => {

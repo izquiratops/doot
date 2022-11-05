@@ -1,21 +1,21 @@
-import { KeyCharacter } from './types';
+import { KeyCharacter, InputKeys, MouseCoords } from "./types";
 
 export class Input {
     private readonly WASD = 'wasd'.split('');
 
-    readonly keyState = Object.seal({
+    readonly keyState: InputKeys = {
         w: 0,
         a: 0,
         s: 0,
         d: 0,
         leftClick: 0,
         rightClick: 0,
-    });
+    };
 
-    readonly mouseCoords = Object.seal({
+    readonly mouseCoords: MouseCoords = {
         x: 0,
         y: 0,
-    });
+    };
 
     runListeners = (canvas: HTMLCanvasElement) => {
         document.onkeydown = (ev) => {

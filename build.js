@@ -6,7 +6,7 @@ const esbuild = require('esbuild');
         entryPoints: ['./src/main.ts'],
         outdir: 'dist',
         bundle: true,
-        minify: false,
+        minify: true,
         format: 'esm',
         metafile: true,
     });

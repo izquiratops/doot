@@ -5,6 +5,7 @@ import { Renderer } from './renderer/renderer';
 import { FRAGMENT_SOURCE, VERTEX_SOURCE } from './renderer/shaders';
 import { Box } from './objects/box';
 import { Input } from './input/input';
+import { Game } from './game/game';
 
 window.onload = () => {
     // Get Canvas DOM reference
@@ -23,6 +24,9 @@ window.onload = () => {
     // Setup input listeners
     const input = new Input();
     input.runListeners(glCanvasRef);
+
+    // TODO Setup game context
+    // const game = new Game();
 
     // Run an instance of the Renderer with WebGL Context and the state of the GUI
     const scene = new Renderer(gl);
