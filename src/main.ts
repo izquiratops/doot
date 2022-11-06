@@ -1,10 +1,10 @@
 import { FRAGMENT_SOURCE, VERTEX_SOURCE } from './renderer/shaders';
 import { Renderer } from './renderer/renderer';
-import { MapLoader } from './map/map-loader';
+import { ObjLoader } from './utils/obj-loader';
 import { Input } from './input/input';
-import { Game } from './game/game';
+import { Object3D } from './map/types';
 
-window.onload = () => {
+window.onload = async function () {
     // Get Canvas DOM reference
     const glCanvasRef = document.getElementById(
         'glCanvas',
@@ -20,15 +20,14 @@ window.onload = () => {
 
     // Setup input listeners
     const input = new Input();
-    input.runListeners(glCanvasRef);
+    input.listenEvents(glCanvasRef);
 
-    MapLoader.parse('./assets/maps/example.obj').then((data) =>
-        console.log('map loaded', data),
-    );
+    // Load game level
+    const map: Object3D = await ObjLoader.parse('./assets/maps/box.obj');
 
     // Run an instance of the Renderer with WebGL Context and the state of the GUI
     const scene = new Renderer(gl);
     scene.initProgram(VERTEX_SOURCE, FRAGMENT_SOURCE);
-    // scene.initBuffers();
+    scene.createBufferInfo(map);
     scene.runFrames();
 };

@@ -1,4 +1,4 @@
-export interface RotationAxis {
+export interface WorldAxis {
     x: number;
     y: number;
     z: number;
@@ -6,7 +6,8 @@ export interface RotationAxis {
 
 export interface Buffers {
     position: WebGLBuffer;
-    color: WebGLBuffer;
+    numElements: number;
+    color?: WebGLBuffer;
     index?: WebGLBuffer;
     normal?: WebGLBuffer;
 }
@@ -20,6 +21,7 @@ export interface ProgramInfo {
     };
     uniformLocations: {
         matrix: WebGLUniformLocation;
+        color?: WebGLUniformLocation;
         reverseLightDirection?: WebGLUniformLocation;
     };
 }

@@ -1,36 +1,41 @@
-import { glMatrix, mat4, vec3 } from 'gl-matrix';
-import { Buffers, ProgramInfo, RotationAxis } from './types';
-import { Box } from '../objects/box';
+import { mat4, vec3 } from 'gl-matrix';
+import { Buffers, ProgramInfo, WorldAxis } from './types';
+import { MathTools } from '../utils/math';
+import { Object3D } from '../map/types';
 
 export class Renderer {
-    readonly rotation: RotationAxis = {
+    readonly position: WorldAxis = {
+        x: 0,
+        y: 0,
+        z: -100,
+    };
+
+    readonly rotation: WorldAxis = {
         x: 0,
         y: 0,
         z: 0,
     };
 
     private programInfo: ProgramInfo;
-    private buffers: Buffers;
+    private bufferInfo: Buffers;
 
     constructor(private gl: WebGL2RenderingContext) {}
 
-    initProgram(VERTEX_SOURCE: string, FRAGMENT_SOURCE: string): void {
-        const shaderProgram = this.createProgramFromGlsl(
-            VERTEX_SOURCE,
-            FRAGMENT_SOURCE,
-        );
+    initProgram(VERTEX: string, FRAGMENT: string): void {
+        const shaderProgram = this.createProgramFromGlsl(VERTEX, FRAGMENT);
 
         this.programInfo = {
             program: shaderProgram,
             attribLocations: {
                 vertexPosition: this.gl.getAttribLocation(
                     shaderProgram,
-                    'a_vertex',
+                    'a_position',
                 ),
+                /* TODO color
                 vertexColor: this.gl.getAttribLocation(
                     shaderProgram,
                     'a_color',
-                ),
+                ), */
                 vertexNormal: this.gl.getAttribLocation(
                     shaderProgram,
                     'a_normal',
@@ -38,6 +43,8 @@ export class Renderer {
             },
             uniformLocations: {
                 matrix: this.gl.getUniformLocation(shaderProgram, 'u_matrix'),
+                // TODO color
+                color: this.gl.getUniformLocation(shaderProgram, 'u_color'),
                 reverseLightDirection: this.gl.getUniformLocation(
                     shaderProgram,
                     'u_reverseLightDirection',
@@ -46,64 +53,53 @@ export class Renderer {
         };
     }
 
-    initBuffers(mesh: Box): void {
-        // This way I avoid to get a horde of ugly this.gl everywhere
+    createBufferInfo(mesh: Object3D): void {
         const { gl } = this;
 
         const positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.bufferData(
             gl.ARRAY_BUFFER,
-            new Float32Array(mesh.vertices),
+            new Float32Array(mesh.position),
             gl.STATIC_DRAW,
         );
 
+        /* TODO color
         const colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferData(
             gl.ARRAY_BUFFER,
             new Uint8Array(mesh.colors),
             gl.STATIC_DRAW,
-        );
-
-        const indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(
-            gl.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array(mesh.indices),
-            gl.STATIC_DRAW,
-        );
+        ); */
 
         const normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         gl.bufferData(
             gl.ARRAY_BUFFER,
-            new Float32Array(mesh.normals),
+            new Float32Array(mesh.normal),
             gl.STATIC_DRAW,
         );
 
-        this.buffers = {
+        this.bufferInfo = {
+            numElements: mesh.position.length,
             position: positionBuffer,
-            color: colorBuffer,
-            index: indexBuffer,
             normal: normalBuffer,
         };
     }
 
     runFrames() {
         const gameFrame = (now: number) => {
-            now *= 0.001;
-
-            // Clear canvas before drawing on top
-            this.clearScene(255, 255, 255);
-
-            // TODO: Update entities
+            now *= 0.001; // from ms to s
 
             // Check if canvas has to be resized
             this.resizeCanvasToDisplaySize();
 
+            // Clear canvas before drawing on top
+            this.clearScene(255, 255, 255);
+
             // Draw scene on canvas
-            // this.drawScene();
+            this.drawScene();
 
             // Move to the following frame
             requestAnimationFrame(gameFrame);
@@ -122,8 +118,6 @@ export class Renderer {
         gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        // TODO: Num lights to 0 & clear light buffer
     }
 
     /**
@@ -132,36 +126,37 @@ export class Renderer {
      * @private
      */
     private drawScene() {
-        const { gl, programInfo, buffers } = this;
+        const { gl, programInfo, bufferInfo } = this;
 
         gl.useProgram(programInfo.program);
 
         const projectionMatrix = ((): mat4 => {
-            const fieldOfView = glMatrix.toRadian(90);
             const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            const fieldOfView = MathTools.degToRad(90);
             const zNear = 0.1;
             const zFar = 100.0;
 
-            const matrix = mat4.create();
-            mat4.perspective(matrix, fieldOfView, aspect, zNear, zFar);
+            const projection = mat4.create();
+            mat4.perspective(projection, fieldOfView, aspect, zNear, zFar);
 
+            // TODO: would be nice to have a 'lookAt' function to avoid this translate/rotate lines
             mat4.translate(
-                matrix,
-                matrix,
+                projection,
+                projection,
                 // prettier-ignore
-                [0.0, 0.0, -3.0],
+                [this.position.x, this.position.y, this.position.z],
             );
 
-            mat4.rotate(matrix, matrix, this.rotation.x, [1, 0, 0]);
-            mat4.rotate(matrix, matrix, this.rotation.y, [0, 1, 0]);
-            mat4.rotate(matrix, matrix, this.rotation.z, [0, 0, 1]);
+            mat4.rotate(projection, projection, this.rotation.x, [1, 0, 0]);
+            mat4.rotate(projection, projection, this.rotation.y, [0, 1, 0]);
+            mat4.rotate(projection, projection, this.rotation.z, [0, 0, 1]);
 
-            return matrix;
+            return projection;
         })();
 
         // Set VERTEX buffer position
         {
-            const buffer = buffers.position;
+            const buffer = bufferInfo.position;
             const bufferPosition = programInfo.attribLocations.vertexPosition;
             const size = 3;
             const type = gl.FLOAT;
@@ -183,7 +178,7 @@ export class Renderer {
             gl.enableVertexAttribArray(bufferPosition);
         }
 
-        // Set COLOR buffer position
+        /* TODO color
         {
             const buffer = buffers.color;
             const bufferPosition = programInfo.attribLocations.vertexColor;
@@ -205,14 +200,11 @@ export class Renderer {
             );
 
             gl.enableVertexAttribArray(bufferPosition);
-        }
-
-        // Set INDICES buffer array
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+        } */
 
         // Set NORMALS buffer array
         {
-            const buffer = buffers.normal;
+            const buffer = bufferInfo.normal;
             const bufferPosition = programInfo.attribLocations.vertexNormal;
             const size = 3;
             const type = gl.FLOAT;
@@ -234,26 +226,20 @@ export class Renderer {
             gl.enableVertexAttribArray(bufferPosition);
         }
 
-        // TODO: Learn about matrix types
+        // Calls gl.uniform
         gl.uniformMatrix4fv(
             programInfo.uniformLocations.matrix,
             false,
             projectionMatrix,
         );
 
-        // Setting the light direction
         const lightDirection = vec3.fromValues(0.5, 0.7, 1.0);
         gl.uniform3fv(
             programInfo.uniformLocations.reverseLightDirection,
             lightDirection,
         );
 
-        {
-            const vertexCount = 6 * 6; // 6 faces --> Every face has 2 triangles --> Every tri has 3 vertices
-            const type = gl.UNSIGNED_SHORT;
-            const offset = 0;
-            gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-        }
+        gl.drawArrays(gl.TRIANGLES, 0, this.bufferInfo.numElements);
     }
 
     private loadShader(shaderType: GLenum, shaderSource: string): WebGLShader {

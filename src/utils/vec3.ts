@@ -92,21 +92,3 @@ export abstract class Vec3Tools {
         return normalizeVector(tmp);
     }
 }
-
-export abstract class MathTools {
-    static clamp(v: number, min: number, max: number) {
-        if (v < min) {
-            return min;
-        } else if (v > max) {
-            return max;
-        } else {
-            return v;
-        }
-    }
-
-    static angleMod(rad: number) {
-        return Math.atan2(Math.sin(rad), Math.cos(rad));
-    }
-
-    // TODO static scale() {}
-}

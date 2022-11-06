@@ -16,7 +16,9 @@ const copyRecursiveSync = (src, dest) => {
             copyRecursiveSync(childSrc, childDest);
         });
     } else {
-        fs.copyFileSync(src, dest);
+        if (path.basename(src) !== '.gitkeep') {
+            fs.copyFileSync(src, dest);
+        }
     }
 };
 
@@ -25,7 +27,7 @@ const copyRecursiveSync = (src, dest) => {
         entryPoints: ['./src/main.ts'],
         outdir: 'dist',
         bundle: true,
-        minify: true,
+        minify: false,
         format: 'esm',
         metafile: true,
     });

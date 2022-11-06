@@ -1,7 +1,10 @@
-import { VertexData } from './types';
+import { Object3D } from '../map/types';
 
-export abstract class MapLoader {
-    static async parse(path: string): Promise<VertexData> {
+// [position, texcoords, normals]
+type WebGlTuple = [Array<number>, Array<number>, Array<number>];
+
+export abstract class ObjLoader {
+    static async parse(path: string): Promise<Object3D> {
         // Raw .OBJ script data
         // v: Vertex position
         const objPositions = [[0, 0, 0]];
@@ -22,11 +25,17 @@ export abstract class MapLoader {
             const pointer = vert.split('/');
 
             // Every vert value points into a vertex data position, texcoord or normal
-            for (let idx = 0; idx < pointer.length; idx++) {
+            for (
+                let keywordIndex = 0;
+                keywordIndex < pointer.length;
+                keywordIndex++
+            ) {
                 // idx: 0 -> v | 1 -> vt | 2 -> vn
-                if (pointer[idx]) {
-                    const objIndex = parseInt(pointer[idx]);
-                    webglVertexData[idx].push(...objVertexData[idx][objIndex]);
+                if (pointer[keywordIndex]) {
+                    const pointerIndex = parseInt(pointer[keywordIndex]);
+                    webglVertexData[keywordIndex].push(
+                        ...objVertexData[keywordIndex][pointerIndex],
+                    );
                 }
             }
         }
@@ -54,10 +63,15 @@ export abstract class MapLoader {
         };
 
         // WebGL Vertex Data
-        const webglVertexData: any = [[], [], []];
+        const webglVertexData: WebGlTuple = [[], [], []];
 
         // Start reading the script
-        const content = await (await fetch(path)).text();
+        const response = await fetch(path);
+        if (!response.ok) {
+            throw new Error(`${response.statusText}: ${path}`);
+        }
+
+        const content = await response.text();
         const filter = /(\w*)(?: )*(.*)/;
         const lines = content.split('\n');
 

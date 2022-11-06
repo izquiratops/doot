@@ -1,3 +1,5 @@
+// Unused
+
 export class Box {
     // prettier-ignore
     private _vertices = [

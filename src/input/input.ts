@@ -17,7 +17,7 @@ export class Input {
         y: 0,
     };
 
-    runListeners = (canvas: HTMLCanvasElement) => {
+    listenEvents = (canvas: HTMLCanvasElement) => {
         document.onkeydown = (ev) => {
             ev.preventDefault();
 
