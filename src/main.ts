@@ -4,11 +4,16 @@ import { ObjLoader } from './utils/obj-loader';
 import { Input } from './input/input';
 import { Object3D } from './map/types';
 
-window.onload = async function () {
+window.onload = async () => {
     // Get Canvas DOM reference
     const glCanvasRef = document.getElementById(
         'glCanvas',
     ) as HTMLCanvasElement;
+
+    glCanvasRef.onclick = () => {
+        console.debug('Pointer locked on canvas');
+        glCanvasRef.requestPointerLock();
+    }
 
     // Get WebGL2 context
     const gl: WebGL2RenderingContext = glCanvasRef.getContext('webgl2');
