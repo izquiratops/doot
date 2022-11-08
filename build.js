@@ -4,11 +4,11 @@ const esbuild = require('esbuild');
 
 function formatSize(sizeInBytes) {
     if (sizeInBytes > 1024 * 1024) {
-        return `${(sizeInBytes / 1024 * 1024).toFixed(3)}Mb`;
+        return `${((sizeInBytes / 1024) * 1024).toFixed(3)}Mb`;
     } else if (sizeInBytes > 1024) {
         return `${(sizeInBytes / 1024).toFixed(3)}kb`;
     } else {
-        return `${sizeInBytes}b`
+        return `${sizeInBytes}b`;
     }
 }
 

@@ -1,7 +1,4 @@
-import { Object3D } from '../map/types';
-
-// [position, texcoords, normals]
-type WebGlTuple = [Array<number>, Array<number>, Array<number>];
+import { Geometry, Object3D, WebGlTuple } from '../map/types';
 
 export abstract class ObjLoader {
     static async parse(path: string): Promise<Object3D> {
@@ -40,6 +37,46 @@ export abstract class ObjLoader {
             }
         }
 
+        // WebGL Vertex Data
+        let webglVertexData: WebGlTuple = [[], [], []];
+
+        // TODO Materials
+        const geometries: Array<Geometry> = [];
+        const materialLibs: Array<string> = [];
+        let geometry: Geometry;
+        let material = 'default';
+
+        function newGeometry() {
+            if (geometry?.data.position.length) {
+                geometry = undefined;
+            }
+        }
+
+        function setGeometry() {
+            if (!geometry) {
+                // Raw .OBJ script data
+                // v: Vertex position
+                const position: Array<number> = [];
+                // vt: Texture coordinates
+                const texcoord: Array<number> = [];
+                // vn: Normal coordinates
+                const normal: Array<number> = [];
+
+                webglVertexData = [position, texcoord, normal];
+
+                geometry = {
+                    material,
+                    data: {
+                        position,
+                        texcoord,
+                        normal,
+                    },
+                };
+
+                geometries.push(geometry);
+            }
+        }
+
         // Method to parse data for every supported keyword
         const pushVertexData: { [keyword: string]: Function } = {
             v(args: Array<string>) {
@@ -52,6 +89,8 @@ export abstract class ObjLoader {
                 objTexcoords.push(args.map(parseFloat));
             },
             f(args: Array<string>) {
+                setGeometry();
+
                 // Triangulate face
                 const numTriangles = args.length - 2;
                 for (let idx = 0; idx < numTriangles; ++idx) {
@@ -60,10 +99,16 @@ export abstract class ObjLoader {
                     addVertex(args[idx + 2]);
                 }
             },
+            usemtl({ 0: args }: Array<string>) {
+                console.debug('usemtl', args);
+                material = args;
+                newGeometry();
+            },
+            mtllib({ 0: args }: Array<string>) {
+                console.debug('usemtl', args);
+                materialLibs.push(args);
+            },
         };
-
-        // WebGL Vertex Data
-        const webglVertexData: WebGlTuple = [[], [], []];
 
         // Start reading the script
         const response = await fetch(path);
@@ -99,10 +144,15 @@ export abstract class ObjLoader {
             }
         }
 
-        return {
-            position: webglVertexData[0],
-            texcoord: webglVertexData[1],
-            normal: webglVertexData[2],
-        };
+        // Get rid of missing properties like texcoords or normals
+        for (const geometry of geometries) {
+            geometry.data = Object.fromEntries(
+                Object.entries(geometry.data).filter(
+                    ([_, array]) => array.length > 0,
+                ),
+            );
+        }
+
+        return { materialLibs, geometries };
     }
 }
