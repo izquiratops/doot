@@ -13,7 +13,7 @@ window.onload = async () => {
     glCanvasRef.onclick = () => {
         console.debug('Pointer locked on canvas');
         glCanvasRef.requestPointerLock();
-    };
+    }
 
     // Get WebGL2 context
     const gl: WebGL2RenderingContext = glCanvasRef.getContext('webgl2');
